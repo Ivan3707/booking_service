@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, status
 from src.api.dependencies import get_uow
-from src.repositories.unitofwork import UnitOfWork
+from src.core.unitofwork import UnitOfWork
 from src.services.slot_cron import SlotCronService
 
 router = APIRouter(prefix="/cron", tags=["Системные задачи (Cron)"])

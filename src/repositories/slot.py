@@ -54,3 +54,16 @@ class SlotRepository(AbstractRepository[Slot]):
         stmt = select(self.model).where(self.model.room_id == room_id)
         result = await self.session.execute(stmt)
         return result.scalars().all()
+    
+    async def get_by_room_and_date(self, room_id, target_date):
+        day_start = datetime.combine(target_date, time.min)
+        day_end = datetime.combine(target_date, time.max)
+
+        stmt = select(self.model).where(
+            self.model.room_id == room_id,
+            self.model.start_at >= day_start,
+            self.model.start_at <= day_end
+        )
+
+        result = await self.session.execute(stmt)
+        return result.scalars().all()

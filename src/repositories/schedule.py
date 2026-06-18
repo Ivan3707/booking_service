@@ -9,33 +9,12 @@ class ScheduleRepository(AbstractRepository[Schedule]):
 
     model = Schedule
 
-    async def get_by_room_and_day(self, room_id: UUID, day_of_week: int) -> Schedule | None:
-        """Ищет расписание для конкретной комнаты в определенный день недели."""
-        query = select(Schedule).where(
-            Schedule.room_id == room_id,
-            Schedule.day_of_week == day_of_week
-        )
-        result = await self.session.execute(query)
-        return result.scalar_one_or_none()
-
     async def get_by_day(self, day_of_week: int) -> list[Schedule]:
         """Выгребает расписания ВСЕХ комнат для конкретного дня недели (нужно для робота)."""
         query = select(Schedule).where(Schedule.day_of_week == day_of_week)
         result = await self.session.execute(query)
         return list(result.scalars().all())
 
-    async def create(self, room_id: UUID, day_of_week: int, start_time, end_time) -> Schedule:
-        """Создает новое правило расписания."""
-        schedule = Schedule(
-            room_id=room_id, 
-            day_of_week=day_of_week, 
-            start_time=start_time, 
-            end_time=end_time
-        )
-        self.session.add(schedule)
-        await self.session.flush()
-        return schedule
-    
     async def get_by_room_and_day(self, room_id, day_of_week):
         stmt = select(self.model).where(
             self.model.room_id == room_id,
@@ -64,3 +43,9 @@ class ScheduleRepository(AbstractRepository[Schedule]):
 
         # если уже создано другим потоком
         return await self.get_by_room_and_day(room_id, day_of_week)
+    
+
+    async def get_by_room(self, room_id: UUID):
+        stmt = select(self.model).where(self.model.room_id == room_id)
+        result = await self.session.execute(stmt)
+        return result.scalars().all()

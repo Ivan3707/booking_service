@@ -6,16 +6,17 @@ from datetime import datetime, timedelta
 
 from src.core.exceptions import SlotAlreadyBookedException
 from src.schemas.booking import BookingCreateSchema
-from src.repositories.unitofwork import UnitOfWork
+from src.core.unitofwork import UnitOfWork
 from src.services.booking import BookingService
 
 
+
 @pytest.mark.asyncio
-async def test_booking_race_condition():
+async def test_booking_race_condition(sessionmaker):
 
     service = BookingService()
 
-    async with UnitOfWork() as uow:
+    async with UnitOfWork(sessionmaker()) as uow:
 
         room = await uow.rooms.create(
             name="Test Room",
@@ -39,7 +40,7 @@ async def test_booking_race_condition():
 
     async def make_booking(user_id):
 
-        async with UnitOfWork() as uow:
+        async with UnitOfWork(sessionmaker()) as uow:
 
             return await service.create_booking(
                 uow,

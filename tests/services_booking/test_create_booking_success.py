@@ -2,17 +2,17 @@ import pytest
 from uuid import uuid4
 from datetime import datetime, timedelta
 
-from src.repositories.unitofwork import UnitOfWork
+from src.core.unitofwork import UnitOfWork
 from src.schemas.booking import BookingCreateSchema
 from src.services.booking import BookingService
 
 
 @pytest.mark.asyncio
-async def test_create_booking_success():
+async def test_create_booking_success(sessionmaker):
 
     service = BookingService()
 
-    async with UnitOfWork() as uow:
+    async with UnitOfWork(sessionmaker()) as uow:
 
         user = await uow.users.create(
             email="test@test.com"
@@ -30,7 +30,7 @@ async def test_create_booking_success():
             end_at=datetime.now() + timedelta(hours=1)
         )
 
-    async with UnitOfWork() as uow:
+    async with UnitOfWork(sessionmaker()) as uow:
 
         booking = await service.create_booking(
             uow,

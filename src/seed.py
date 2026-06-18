@@ -1,6 +1,6 @@
 import asyncio
 from datetime import time
-from src.repositories.unitofwork import UnitOfWork
+from src.core.unitofwork import UnitOfWork
 from src.models.models import User, RoleEnum, Room, Schedule
 
 

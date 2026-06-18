@@ -1,7 +1,9 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from uuid import UUID
-from src.repositories.unitofwork import UnitOfWork
-from src.schemas.booking import BookingCreateSchema
+
+from fastapi import HTTPException, status
+from src.models.models import BookingStatusEnum
+from src.core.unitofwork import UnitOfWork
 from sqlalchemy.exc import IntegrityError
 from src.core.exceptions import (
     SlotAlreadyBookedException,
@@ -18,24 +20,31 @@ class BookingService:
 
         # 2. проверка времени
         now = datetime.utcnow()
-        if slot.start_at < now:
+        if slot.start_at <= now:
             raise BadRequestException("Нельзя бронировать прошедшие слоты")
 
         # 3. создаём бронь (конкуренция решается БД)
         try:
             return await uow.bookings.create(
                 user_id=user_id,
-                slot_id=schema.slot_id
+                slot_id=schema.slot_id,
+                status=BookingStatusEnum.ACTIVE
             )
 
         except IntegrityError as e:
-            raise SlotAlreadyBookedException("Слот уже занят") from e
+            if "uq_booking_active_slot" in str(e.orig):
+                raise SlotAlreadyBookedException("Слот уже занят") from e
+            raise
 
-    async def cancel_booking(self, uow: UnitOfWork, booking_id: UUID, user_id: UUID):
-        async with uow:
-            result = await uow.bookings.cancel_booking(booking_id, user_id)
+    async def cancel_booking(self, uow, booking_id):
+        booking = await uow.bookings.get_by_id(booking_id)
 
-            if not result:
-                raise BookingNotFoundException()
+        if not booking:
+            raise HTTPException(status_code=404, detail="Booking not found")
 
-            return {"status": "success", "message": "Бронирование успешно отменено"}
+        if booking.status == BookingStatusEnum.CANCELED:
+            raise HTTPException(status_code=400, detail="Already cancelled")
+
+        updated = await uow.bookings.cancel(booking_id)
+
+        return updated

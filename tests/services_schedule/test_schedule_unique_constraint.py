@@ -1,16 +1,18 @@
 import pytest
 from datetime import time
 
-from src.repositories.unitofwork import UnitOfWork
+from src.core.exceptions import ScheduleAlreadyExistsException
+from src.core.unitofwork import UnitOfWork
 from src.services.schedule import ScheduleService
 from src.schemas.schedule import ScheduleCreateSchema
 
 
+
 @pytest.mark.asyncio
-async def test_schedule_unique_constraint():
+async def test_schedule_unique_constraint(sessionmaker):
     service = ScheduleService()
 
-    async with UnitOfWork() as uow:
+    async with UnitOfWork(sessionmaker()) as uow:
         room = await uow.rooms.create(
             name="Room",
             description="test",
@@ -24,11 +26,10 @@ async def test_schedule_unique_constraint():
         end_time=time(10, 0)
     )
 
-    # первый успешный
-    async with UnitOfWork() as uow:
-        await service.create_schedule_with_slots(uow, schema)
+    async with UnitOfWork(sessionmaker()) as uow:
+        schedule1 = await service.create_schedule_with_slots(uow, schema)
 
-    # второй должен упасть
-    with pytest.raises(Exception):
-        async with UnitOfWork() as uow:
-            await service.create_schedule_with_slots(uow, schema)
+    async with UnitOfWork(sessionmaker()) as uow:
+        schedule2 = await service.create_schedule_with_slots(uow, schema)
+
+    assert schedule1.id == schedule2.id

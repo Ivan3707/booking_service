@@ -2,17 +2,18 @@ import pytest
 from uuid import uuid4
 from datetime import time, date
 
-from src.repositories.unitofwork import UnitOfWork
+from src.core.unitofwork import UnitOfWork
 from src.services.schedule import ScheduleService
 from src.schemas.schedule import ScheduleCreateSchema
 
 
+
 @pytest.mark.asyncio
-async def test_create_schedule_creates_slots():
+async def test_create_schedule_creates_slots(sessionmaker):
 
     service = ScheduleService()
 
-    async with UnitOfWork() as uow:
+    async with UnitOfWork(sessionmaker()) as uow:
 
         room = await uow.rooms.create(
             name="Test Room",

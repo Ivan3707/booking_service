@@ -12,8 +12,8 @@ class RoleEnum(str, enum.Enum):
     USER = "user"
 
 class BookingStatusEnum(str, enum.Enum):
-    ACTIVE = "active"
-    CANCELLED = "cancelled"
+    ACTIVE = "ACTIVE"
+    CANCELED = "CANCELED"
 
 class User(Base):
     __tablename__ = "users"

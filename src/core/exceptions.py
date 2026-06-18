@@ -30,3 +30,16 @@ class SlotNotFoundException(BusinessException):
     def __init__(self, message="Слот не найден"):
         self.message = message
         super().__init__(self.message)
+
+class ScheduleAlreadyExistsException(Exception):
+    def __init__(self, message="Расписание Уже существует"):
+        self.message = message
+        super().__init__(self.message)
+
+
+class BookingAlreadyExistsException(Exception):
+    pass
+
+
+class NotFoundException(Exception):
+    pass

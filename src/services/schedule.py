@@ -1,8 +1,6 @@
-from datetime import date, timedelta
-from uuid import UUID
-from src.repositories.unitofwork import UnitOfWork
+from datetime import UTC, datetime, timedelta
+from src.core.exceptions import ScheduleAlreadyExistsException
 from src.domain.slot_generator import DomainSlotGenerator
-from src.schemas.schedule import ScheduleCreateSchema
 
 class ScheduleService:
     """Сервис для управления расписанием комнат (административная панель)."""
@@ -13,15 +11,17 @@ class ScheduleService:
             schema.day_of_week
         )
 
-        if not schedule:
-            schedule = await uow.schedules.create(
-                room_id=schema.room_id,
-                day_of_week=schema.day_of_week,
-                start_time=schema.start_time,
-                end_time=schema.end_time
-            )
+        if schedule:
+            raise ScheduleAlreadyExistsException()
 
-        today = date.today()
+        schedule = await uow.schedules.create(
+            room_id=schema.room_id,
+            day_of_week=schema.day_of_week,
+            start_time=schema.start_time,
+            end_time=schema.end_time
+)
+
+        today = datetime.now(UTC).date()
 
         for i in range(30):
             d = today + timedelta(days=i)

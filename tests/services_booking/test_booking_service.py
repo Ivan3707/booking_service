@@ -2,18 +2,19 @@ from uuid import uuid4
 
 import pytest
 
-from src.repositories.unitofwork import UnitOfWork
+from src.core.unitofwork import UnitOfWork
 from src.schemas.booking import BookingCreateSchema
 from src.services.booking import BookingService
 from src.core.exceptions import SlotNotFoundException
 
 
+
 @pytest.mark.asyncio
-async def test_create_booking_slot_not_found():
+async def test_create_booking_slot_not_found(sessionmaker):
 
     service = BookingService()
 
-    async with UnitOfWork() as uow:
+    async with UnitOfWork(sessionmaker()) as uow:
 
         with pytest.raises(SlotNotFoundException):
 
