@@ -14,7 +14,7 @@ class BookingRepository(AbstractRepository[Booking]):
         if not booking:
             raise BookingNotFoundException()
 
-        booking.status = BookingStatusEnum.CANCELED
+        booking.status = BookingStatusEnum.CANCELLED
 
         return booking
 

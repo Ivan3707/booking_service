@@ -14,7 +14,7 @@ async def test_create_booking_slot_not_found(sessionmaker):
 
     service = BookingService()
 
-    async with UnitOfWork(sessionmaker()) as uow:
+    async with UnitOfWork(sessionmaker) as uow:
 
         with pytest.raises(SlotNotFoundException):
 

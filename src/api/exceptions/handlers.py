@@ -5,7 +5,11 @@ from src.core.exceptions import (
     BookingAlreadyExistsException,
     ScheduleAlreadyExistsException,
     NotFoundException,
+    SlotAlreadyBookedException,
+    SlotNotFoundException,
+    BadRequestException,
 )
+
 
 
 async def booking_already_exists_handler(
@@ -16,7 +20,7 @@ async def booking_already_exists_handler(
         status_code=409,
         content={
             "status": "error",
-            "message": str(exc) or "Booking already exists"
+            "message": str(exc)
         }
     )
 
@@ -29,7 +33,7 @@ async def schedule_already_exists_handler(
         status_code=409,
         content={
             "status": "error",
-            "message": str(exc) or "Schedule already exists"
+            "message": str(exc)
         }
     )
 
@@ -42,6 +46,44 @@ async def not_found_handler(
         status_code=404,
         content={
             "status": "error",
-            "message": str(exc) or "Not found"
+            "message": str(exc) 
+        }
+    )
+
+async def slot_already_booked_handler(
+    request: Request,
+    exc: SlotAlreadyBookedException
+):
+    return JSONResponse(
+        status_code=409,
+        content={
+            "status": "error",
+            "message": str(exc)
+        }
+    )
+
+
+async def slot_not_found_handler(
+    request: Request,
+    exc: SlotNotFoundException
+):
+    return JSONResponse(
+        status_code=404,
+        content={
+            "status": "error",
+            "message": str(exc)
+        }
+    )
+
+
+async def bad_request_handler(
+    request: Request,
+    exc: BadRequestException
+):
+    return JSONResponse(
+        status_code=400,
+        content={
+            "status": "error",
+            "message": str(exc)
         }
     )

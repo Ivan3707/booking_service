@@ -1,20 +1,20 @@
 import pytest
-from uuid import uuid4
 from datetime import datetime, timedelta
 
 from src.core.unitofwork import UnitOfWork
 from src.schemas.booking import BookingCreateSchema
 from src.services.booking import BookingService
+from src.core.exceptions import SlotAlreadyBookedException
 
 
 @pytest.mark.asyncio
-async def test_create_booking_success(sessionmaker):
+async def test_slot_already_booked(sessionmaker):
 
     service = BookingService()
 
-    # ARRANGE (persisted data must live after UoW closes)
     async with UnitOfWork(sessionmaker) as uow:
-        user = await uow.users.create(email="test@test.com")
+        user1 = await uow.users.create(email="u1@test.com")
+        user2 = await uow.users.create(email="u2@test.com")
 
         room = await uow.rooms.create(
             name="Room",
@@ -28,15 +28,19 @@ async def test_create_booking_success(sessionmaker):
             end_at=datetime.utcnow() + timedelta(hours=1)
         )
 
-    # ACT
+    # first booking
     async with UnitOfWork(sessionmaker) as uow:
-        booking = await service.create_booking(
+        await service.create_booking(
             uow,
             BookingCreateSchema(slot_id=slot.id),
-            user_id=user.id
+            user_id=user1.id
         )
 
-    # ASSERT
-    assert booking.id is not None
-    assert booking.slot_id == slot.id
-    assert booking.user_id == user.id
+    # second must fail
+    async with UnitOfWork(sessionmaker) as uow:
+        with pytest.raises(SlotAlreadyBookedException):
+            await service.create_booking(
+                uow,
+                BookingCreateSchema(slot_id=slot.id),
+                user_id=user2.id
+            )

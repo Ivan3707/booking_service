@@ -13,7 +13,7 @@ class RoleEnum(str, enum.Enum):
 
 class BookingStatusEnum(str, enum.Enum):
     ACTIVE = "ACTIVE"
-    CANCELED = "CANCELED"
+    CANCELLED = "CANCELLED"
 
 class User(Base):
     __tablename__ = "users"

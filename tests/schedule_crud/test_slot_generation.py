@@ -3,6 +3,7 @@ from src.domain.slot_generator import DomainSlotGenerator
 
 
 def test_slot_generation_basic():
+
     room_id = "00000000-0000-0000-0000-000000000000"
     target_date = date(2026, 6, 15)
 

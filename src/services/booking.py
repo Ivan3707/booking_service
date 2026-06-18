@@ -32,6 +32,7 @@ class BookingService:
             )
 
         except IntegrityError as e:
+            await uow.session.rollback()
             if "uq_booking_active_slot" in str(e.orig):
                 raise SlotAlreadyBookedException("Слот уже занят") from e
             raise
@@ -40,10 +41,10 @@ class BookingService:
         booking = await uow.bookings.get_by_id(booking_id)
 
         if not booking:
-            raise HTTPException(status_code=404, detail="Booking not found")
+            raise HTTPException(status_code=404, detail="Бронирование не найдено")
 
-        if booking.status == BookingStatusEnum.CANCELED:
-            raise HTTPException(status_code=400, detail="Already cancelled")
+        if booking.status == BookingStatusEnum.CANCELLED:
+            raise HTTPException(status_code=400, detail="Уже отменено")
 
         updated = await uow.bookings.cancel(booking_id)
 

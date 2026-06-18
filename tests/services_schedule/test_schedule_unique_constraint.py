@@ -7,12 +7,12 @@ from src.services.schedule import ScheduleService
 from src.schemas.schedule import ScheduleCreateSchema
 
 
-
 @pytest.mark.asyncio
-async def test_schedule_unique_constraint(sessionmaker):
+async def test_schedule_already_exists(sessionmaker):
+
     service = ScheduleService()
 
-    async with UnitOfWork(sessionmaker()) as uow:
+    async with UnitOfWork(sessionmaker) as uow:
         room = await uow.rooms.create(
             name="Room",
             description="test",
@@ -26,10 +26,9 @@ async def test_schedule_unique_constraint(sessionmaker):
         end_time=time(10, 0)
     )
 
-    async with UnitOfWork(sessionmaker()) as uow:
+    async with UnitOfWork(sessionmaker) as uow:
         schedule1 = await service.create_schedule_with_slots(uow, schema)
 
-    async with UnitOfWork(sessionmaker()) as uow:
-        schedule2 = await service.create_schedule_with_slots(uow, schema)
-
-    assert schedule1.id == schedule2.id
+    async with UnitOfWork(sessionmaker) as uow:
+        with pytest.raises(ScheduleAlreadyExistsException):
+            await service.create_schedule_with_slots(uow, schema)

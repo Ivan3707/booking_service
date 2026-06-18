@@ -38,8 +38,12 @@ class ScheduleAlreadyExistsException(Exception):
 
 
 class BookingAlreadyExistsException(Exception):
-    pass
+    def __init__(self, message="Бронирование уже существует"):
+        self.message = message
+        super().__init__(self.message)
 
 
 class NotFoundException(Exception):
-    pass
+    def __init__(self, message="Не найдено"):
+        self.message = message
+        super().__init__(self.message)
