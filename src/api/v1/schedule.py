@@ -8,7 +8,7 @@ from src.services.schedule import ScheduleService
 from src.schemas.schedule import ScheduleCreateSchema
 
 
-router = APIRouter(prefix="/schedules",tags=["schedule"])
+router = APIRouter()
 
 
 @router.post("", status_code=status.HTTP_201_CREATED)
@@ -29,7 +29,7 @@ async def create_schedule(
         "day_of_week": schedule.day_of_week
     }
 
-@router.get("/schedules")
+@router.get("")
 async def get_schedules(
     room_id: UUID,
     uow: UnitOfWork = Depends(get_uow)

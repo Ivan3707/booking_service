@@ -32,7 +32,7 @@ class BookingService:
             )
 
         except IntegrityError as e:
-            await uow.session.rollback()
+            await uow.rollback()
             if "uq_booking_active_slot" in str(e.orig):
                 raise SlotAlreadyBookedException("Слот уже занят") from e
             raise

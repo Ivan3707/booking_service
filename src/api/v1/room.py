@@ -7,7 +7,7 @@ from src.services.room import RoomService
 from src.schemas.room import RoomCreateSchema, RoomResponseSchema
 
 
-router = APIRouter(prefix="/rooms", tags=["room"])
+router = APIRouter()
 
 service = RoomService()
 

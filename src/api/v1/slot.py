@@ -5,7 +5,7 @@ from uuid import UUID
 from src.api.dependencies import get_uow
 from src.core.unitofwork import UnitOfWork
 
-router = APIRouter(prefix="/slots", tags=["slots"])
+router = APIRouter()
 
 @router.get("")
 async def get_slots(

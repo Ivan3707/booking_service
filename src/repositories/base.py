@@ -32,7 +32,7 @@ class AbstractRepository(Generic[T]):
     
     async def create(self, **data) -> T:
         if self.model is None:
-            raise NotImplementedError("model not set")
+            raise NotImplementedError("модель не установлена")
 
         obj = self.model(**data)
         self.session.add(obj)

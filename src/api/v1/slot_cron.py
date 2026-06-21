@@ -3,7 +3,7 @@ from src.api.dependencies import get_uow
 from src.core.unitofwork import UnitOfWork
 from src.services.slot_cron import SlotCronService
 
-router = APIRouter(prefix="/cron", tags=["Системные задачи (Cron)"])
+router = APIRouter()
 cron_service = SlotCronService()
 
 @router.post("/pregenerate-slots", status_code=status.HTTP_200_OK)
